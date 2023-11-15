@@ -28,26 +28,39 @@ public class WhiskyController {
     }
 
     @GetMapping(value = "/whiskies/distilleries")
-    public ResponseEntity<List<Whisky>> getWhiskyByAgeFromDistillery(@RequestParam(name="age", required = false) Integer age, @RequestParam(name="distillery", required = false) String distillery) {
-        if (distillery != null)
-            if (age != null) {
-                return new ResponseEntity<>(whiskyRepository.findByAgeAndDistilleryNameEquals(age, distillery), HttpStatus.OK);
-            }
-            else {
-                return new ResponseEntity<>(whiskyRepository.findByDistilleryNameEquals(distillery), HttpStatus.OK);
-            }
-        else {
-            if (age != null){
-                return new ResponseEntity<>(whiskyRepository.findByAgeEquals(age), HttpStatus.OK);
-            }
-            else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-        }
-    }
+    public ResponseEntity<List<Whisky>> getWhiskyByAgeFromDistillery(@RequestParam(name="age", required = false) Integer age, @RequestParam(name="distillery", required = false) String distillery, @RequestParam(name="region", required = false) String region) {
 
-    @GetMapping(value = "/whiskies/distilleries/")
-    public ResponseEntity<List<Whisky>> getWhiskyByRegion(@RequestParam(name="region") String region){
-        return new ResponseEntity<>(whiskyRepository.findByDistilleryRegionEquals(region), HttpStatus.OK);
-    }
+        if (region == null && distillery != null && age != null) {
+            return new ResponseEntity<>(whiskyRepository.findByAgeAndDistilleryNameEquals(age, distillery), HttpStatus.OK);
+        }
+        else if (region == null && distillery != null && age == null) {
+            return new ResponseEntity<>(whiskyRepository.findByDistilleryNameEquals(distillery), HttpStatus.OK);
+        }
+        else if (region == null && distillery == null && age != null) {
+            return new ResponseEntity<>(whiskyRepository.findByAgeEquals(age), HttpStatus.OK);
+        }
+        else if (region == null && distillery == null && age == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        else if (region != null && distillery != null && age != null){
+            return new ResponseEntity<>(whiskyRepository.findByAgeAndDistilleryNameAndDistilleryRegionEquals(age, distillery, region), HttpStatus.OK);
+        }
+        else if (region != null && distillery != null && age == null){
+            return new ResponseEntity<>(whiskyRepository.findByDistilleryNameAndDistilleryRegionEquals(distillery, region), HttpStatus.OK);
+        }
+        else if (region != null && distillery == null && age == null){
+            return new ResponseEntity<>(whiskyRepository.findByDistilleryRegionEquals(region), HttpStatus.OK);
+        }
+        else if (region != null && distillery == null && age != null){
+            return new ResponseEntity<>(whiskyRepository.findByAgeAndDistilleryRegionEquals(age, region), HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+}
+
+//    @GetMapping(value = "/whiskies/distilleries/")
+//    public ResponseEntity<List<Whisky>> getWhiskyByRegion(@RequestParam(name="region") String region){
+//        return new ResponseEntity<>(whiskyRepository.findByDistilleryRegionEquals(region), HttpStatus.OK);
+//    }
 }
